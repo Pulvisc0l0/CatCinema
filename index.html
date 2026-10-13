@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1e0d14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Miao Studios</title>
+<style>
+:root{--bg:#160c11;--panel:#26151c;--panel2:#321b25;--velvet:#8a1628;--velvet2:#5c0d1a;--gold:#e8b54a;--gold2:#ffd77a;--text:#f6eadf;--muted:#b9a39a;--good:#72d491;--bad:#ff6f6f;--line:#47283a;--nav:62px;--turn:72px;--sb:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{overscroll-behavior:none}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:radial-gradient(ellipse at 50% -10%,#3d1522 0%,var(--bg) 55%) fixed;color:var(--text);min-height:100vh;font-size:15px;padding-bottom:calc(var(--nav) + var(--sb) + var(--turn));-webkit-user-select:none;user-select:none}
+input{-webkit-user-select:text;user-select:text}
+button{font-family:inherit;touch-action:manipulation}
+h1,h2,h3{margin:0}
+.top{position:sticky;top:0;z-index:20;padding:calc(8px + env(safe-area-inset-top,0px)) 12px 8px;background:linear-gradient(180deg,#2c1019,#1e0d14);border-bottom:2px solid var(--gold)}
+.toprow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.logo{font-weight:800;font-size:17px;color:var(--gold2);text-shadow:0 2px 0 #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.stats{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-top:8px}
+.stats::-webkit-scrollbar,.ticker::-webkit-scrollbar{display:none}
+.stat{flex:none;background:#0005;border:1px solid var(--line);border-radius:10px;padding:5px 9px;font-size:13px;white-space:nowrap}
+.stat b{color:var(--gold2)}
+.stat.neg b{color:var(--bad)}
+.goalbar{width:60px;height:6px;background:#0008;border-radius:4px;display:inline-block;vertical-align:middle;margin-left:6px;overflow:hidden}
+.goalbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.speed{display:flex;gap:4px;flex:none}
+.speed button{background:#0005;border:1px solid var(--line);color:var(--text);border-radius:9px;min-width:38px;height:36px;padding:0 6px;font-size:13px}
+.speed button.on{background:var(--gold);color:#2a1006;border-color:var(--gold)}
+.ticker{background:#0b0508;border-bottom:1px solid var(--line);padding:6px 12px;font-size:12px;color:var(--muted);display:flex;gap:14px;white-space:nowrap;overflow-x:auto;scrollbar-width:none}
+.ticker b{color:var(--text)}
+.layout{max-width:600px;margin:0 auto;padding:12px}
+.view{display:none}.view.on{display:block}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;box-shadow:0 6px 20px #0006}
+.panel h3{font-size:15px;color:var(--gold2);margin-bottom:10px}
+.stagewrap{position:relative;overflow:hidden;min-height:300px;background:
+ linear-gradient(90deg,var(--velvet2) 0,var(--velvet) 4%,transparent 10%,transparent 90%,var(--velvet) 96%,var(--velvet2) 100%),
+ repeating-linear-gradient(90deg,#0000 0 18px,#0002 18px 22px),
+ radial-gradient(ellipse at 50% 0%,#4a1a28,#1b0b11 70%)}
+.stagewrap::before{content:"";position:absolute;left:0;right:0;top:0;height:22px;background:repeating-linear-gradient(90deg,var(--velvet) 0 26px,var(--velvet2) 26px 30px);border-bottom:3px solid var(--gold);border-radius:0 0 50% 50%/0 0 100% 100%}
+#stage{position:relative;z-index:1;padding:34px 16px 14px;text-align:center}
+#bubbles{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:hidden}
+.bubble{position:absolute;font-weight:800;font-size:14px;padding:3px 8px;border-radius:12px;background:#000a;border:1px solid var(--gold);color:var(--gold2);animation:up 1.6s ease-out forwards;white-space:nowrap}
+.bubble.bad{border-color:var(--bad);color:var(--bad)}
+@keyframes up{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:1;transform:translateY(-10px) scale(1)}100%{transform:translateY(-100px);opacity:0}}
+.marquee{display:inline-block;max-width:100%;margin:10px auto 18px;padding:12px 18px;border:3px solid var(--gold);border-radius:12px;background:#1a0a0f;box-shadow:0 0 0 4px #0008,0 0 24px #e8b54a55;position:relative}
+.marquee h2{font-size:22px;color:var(--gold2);letter-spacing:1.5px;text-shadow:0 0 12px #e8b54a88;word-break:break-word}
+.marquee small{color:var(--muted)}
+.bulbs{position:absolute;inset:-9px;border:4px dotted var(--gold2);border-radius:16px;animation:blink 1s steps(2) infinite;opacity:.7}
+@keyframes blink{50%{opacity:.25}}
+.btn{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:11px;padding:9px 14px;min-height:42px;cursor:pointer;font-size:15px;font-weight:600;transition:transform .1s,filter .1s}
+@media(hover:hover){.btn:hover{filter:brightness(1.2)}}
+.btn:active{transform:scale(.96);filter:brightness(1.15)}
+.btn.gold{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a1006;border-color:#b3832a}
+.btn.red{background:#5a1a22;border-color:#7b2a33}
+.btn.big{font-size:20px;padding:14px 26px;border-radius:14px;width:100%;max-width:340px}
+.btn.sm{min-height:36px;padding:6px 12px;font-size:13px}
+.btn.wide{width:100%;margin-top:8px}
+.btn:disabled{opacity:.4;filter:none;transform:none}
+.prodhead h2{font-size:21px;color:var(--gold2);margin:8px 0 4px}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:20px;background:#0006;border:1px solid var(--line)}
+.tag.hot{border-color:#ff8a3d;color:#ffb27a}
+.tag.cold{border-color:#7fb8ff;color:#a9d0ff}
+.phase{color:var(--muted);font-size:13px}
+.pbar{height:12px;background:#0008;border-radius:8px;overflow:hidden;margin:12px auto;border:1px solid var(--line)}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--velvet),var(--gold));transition:width .12s linear}
+.setcats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:14px 0 10px}
+.sc small{display:block;font-size:11px;color:var(--muted);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex:none;border:2px solid #0006}
+.av.big{width:52px;height:52px;font-size:30px;margin:0 auto;border-color:var(--gold)}
+.bob{animation:bob 1.2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px) rotate(-4deg)}}
+.pts{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;font-size:13px}
+.pts span{background:#0006;padding:5px 9px;border-radius:10px}
+.warn{color:#ffcf8a;font-size:14px;margin-top:12px}
+.cat{display:flex;gap:10px;align-items:center;padding:10px;border-radius:12px;background:#0003;border:1px solid var(--line);margin-bottom:8px}
+.ci{flex:1;min-width:0}
+.ci b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci small{color:var(--muted);font-size:12px}
+.bar{height:5px;background:#0007;border-radius:4px;margin-top:5px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--velvet),var(--gold))}
+.cr{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
+.cr small{color:var(--muted);font-size:11px;line-height:1.3}
+.sk{font-weight:800;font-size:18px;color:var(--gold2)}
+.muted{color:var(--muted);font-size:13px}
+.film{display:flex;gap:10px;align-items:center;padding:10px;border-radius:12px;background:#0003;border:1px solid var(--line);margin-bottom:8px}
+.score{min-width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;background:#0006;border:2px solid var(--gold);flex:none}
+.score.lo{border-color:var(--bad);color:var(--bad)}
+.score.mid{border-color:#e0c060;color:#ffe08a}
+.score.hi{border-color:var(--good);color:var(--good)}
+.pos{color:var(--good)}.neg{color:var(--bad)}
+.news{max-height:280px;overflow:auto;font-size:13px}
+.news div{padding:6px 0;border-bottom:1px dashed var(--line)}
+.news small{display:block;color:var(--muted);font-size:11px}
+.nav{position:fixed;left:0;right:0;bottom:0;height:calc(var(--nav) + var(--sb));padding-bottom:var(--sb);display:flex;background:#1a0b11;border-top:2px solid var(--gold);z-index:30;box-shadow:0 -6px 20px #0008}
+.nav button{flex:1;background:none;border:0;color:var(--muted);font-size:10.5px;font-weight:600;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;position:relative;padding:0}
+.nav .i{font-size:21px;transition:transform .15s}
+.nav button.on{color:var(--gold2)}
+.nav button.on .i{transform:scale(1.15) translateY(-1px)}
+.nav button.on::after{content:"";position:absolute;top:0;left:22%;right:22%;height:3px;border-radius:0 0 3px 3px;background:var(--gold2)}
+.dot{position:absolute;top:7px;left:calc(50% + 8px);width:9px;height:9px;border-radius:50%;background:var(--bad);box-shadow:0 0 0 2px #1a0b11}
+.navprog{position:absolute;bottom:5px;left:22%;right:22%;height:3px;border-radius:2px;background:#0008;overflow:hidden}
+.navprog i{display:block;height:100%;background:var(--gold)}
+.modal-bg{position:fixed;inset:0;background:#000b;display:flex;align-items:flex-end;justify-content:center;z-index:50}
+.modal-bg.hidden{display:none}
+.modal{background:var(--panel);border:2px solid var(--gold);border-bottom:0;border-radius:20px 20px 0 0;max-width:600px;width:100%;max-height:92vh;max-height:92dvh;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:22px 16px calc(14px + var(--sb));box-shadow:0 -10px 50px #000;animation:sheet .25s ease-out;position:relative}
+.modal::before{content:"";position:absolute;top:8px;left:50%;width:42px;height:4px;margin-left:-21px;border-radius:3px;background:var(--line)}
+@keyframes sheet{from{transform:translateY(60px);opacity:.4}}
+@media(min-width:640px){.modal-bg{align-items:center;padding:16px}.modal{border-radius:18px;border-bottom:2px solid var(--gold)}}
+.modal h2{color:var(--gold2);margin-bottom:10px;font-size:20px}
+.steps{display:flex;gap:5px;margin-bottom:14px}
+.steps span{flex:1;text-align:center;font-size:11px;padding:6px 2px;border-radius:8px;background:#0005;color:var(--muted)}
+.steps span.on{background:var(--velvet);color:var(--text)}
+.ggrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
+.gbtn{background:#0004;border:2px solid var(--line);color:var(--text);border-radius:12px;padding:8px 2px;text-align:center;font-size:11px;font-weight:600;min-height:72px;word-break:break-word}
+.gbtn .e{font-size:22px;display:block;margin-bottom:2px}
+.gbtn .tag{font-size:9.5px;padding:1px 5px;margin-top:3px}
+.gbtn.on{border-color:var(--gold);background:#e8b54a22}
+.tlist button{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;margin-bottom:6px;background:#0004;border:2px solid var(--line);color:var(--text);border-radius:12px;padding:12px;min-height:50px;font-size:14px;gap:8px}
+.tlist button span:last-child{flex:none;font-size:11px}
+.tlist button.on{border-color:var(--gold);background:#e8b54a22}
+.row{display:flex;gap:6px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.row label{flex:1 1 100%;font-weight:600;font-size:13px}
+select,input[type=text]{background:#0006;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:16px;flex:1;min-width:0;min-height:46px;width:100%}
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:14px}
+.opt{background:#0004;border:2px solid var(--line);color:var(--text);border-radius:12px;padding:10px 6px;font-size:12px;text-align:center;min-height:66px}
+.opt b{display:block;font-size:14px}
+.opt.on{border-color:var(--gold);background:#e8b54a22}
+.opt:disabled{opacity:.35}
+.slider{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.slider span:first-child{flex:1 1 100%;font-size:13px}
+.slider input{flex:1;accent-color:var(--gold);height:32px}
+.slider b{min-width:44px;text-align:right;color:var(--gold2);font-size:16px}
+.note{background:#0005;border-left:3px solid var(--gold);padding:8px 12px;border-radius:6px;font-size:13px;margin:10px 0}
+.sum{display:grid;grid-template-columns:1fr auto;gap:5px 12px;font-size:13px;background:#0004;padding:10px 12px;border-radius:10px;margin:10px 0}
+.foot{display:flex;gap:8px;margin-top:14px;position:sticky;bottom:calc(-14px - var(--sb));margin-bottom:calc(-14px - var(--sb));padding:12px 0 calc(14px + var(--sb));background:linear-gradient(transparent,var(--panel) 25%);z-index:2}
+.foot .btn{flex:1;min-height:48px}
+.foot span:empty{display:none}
+.review{display:flex;gap:10px;align-items:center;padding:8px;background:#0004;border-radius:10px;margin-bottom:6px;animation:pop .4s backwards}
+.review i{color:var(--muted);font-size:13px}
+@keyframes pop{from{transform:scale(.8);opacity:0}}
+.avg{text-align:center;font-size:40px;font-weight:900;color:var(--gold2);margin:6px 0}
+.title-s{text-align:center}
+.title-s h1{font-size:34px;color:var(--gold2);text-shadow:0 0 18px #e8b54a77}
+.title-s .big-emo{font-size:50px}
+.title-s label{display:block;margin:16px 0 6px;color:var(--muted);font-size:13px}
+.title-s input{width:100%;text-align:center}
+#toasts{position:fixed;bottom:calc(var(--nav) + var(--sb) + var(--turn) + 6px);left:50%;transform:translateX(-50%);z-index:60;display:flex;flex-direction:column;gap:6px;align-items:center;width:min(94vw,520px);pointer-events:none}
+.toast{background:#1d0d13;border:1px solid var(--gold);padding:9px 13px;border-radius:12px;font-size:13px;box-shadow:0 6px 18px #000;animation:pop .3s;width:100%}
+.prev{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;font-size:13px;margin-top:10px}
+.prev .bar{margin:0}
+.turnbar{position:fixed;left:0;right:0;bottom:calc(var(--nav) + var(--sb));padding:8px 12px;z-index:29;background:linear-gradient(transparent,#160c11 35%);display:flex;justify-content:center;pointer-events:none}
+.turnbar .btn{pointer-events:auto;width:100%;max-width:576px;min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.25;box-shadow:0 6px 18px #000a;font-size:17px}
+.turnbar small{font-size:11.5px;font-weight:600;opacity:.8}
+.turnbar .btn:disabled{opacity:.75}
+ul.help{padding-left:20px;line-height:1.55;font-size:14px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="toprow">
+    <div class="logo">🎬🐱 <span id="studioName">Miao Studios</span></div>
+    <button class="btn sm" onclick="help()" aria-label="Come si gioca">❓ Aiuto</button>
+  </div>
+  <div class="stats" id="stats"></div>
+</header>
+<div class="ticker" id="ticker"></div>
+<main class="layout">
+  <section class="view on" id="v-set">
+    <div class="panel stagewrap"><div id="stage"></div><div id="bubbles"></div></div>
+    <div class="panel" id="report" style="display:none"></div>
+    <div class="panel"><h3>🍿 In sala</h3><div id="theaters"></div></div>
+    <div class="panel"><h3>📰 Notizie da Miaowood</h3><div id="news" class="news"></div></div>
+  </section>
+  <section class="view" id="v-side">
+    <div class="panel"><h3 id="sideTitle"></h3><div id="tabc"></div></div>
+  </section>
+</main>
+<div class="turnbar" id="turnbar" style="display:none"><button class="btn gold" id="endTurn" onclick="endTurn()"></button></div>
+<nav class="nav" id="nav"></nav>
+<div id="modalbg" class="modal-bg hidden"><div class="modal" id="modal"></div></div>
+<div id="toasts"></div>
+
+<script>
+/* ================= DATI ================= */
+const KEY='miaostudios_save_v1';
+const GOAL=2000000;
+const ROLES={
+  regista:{n:'Regista',i:'🎬'},
+  attore:{n:'Attore',i:'🎭'},
+  sceneggiatore:{n:'Sceneggiatore',i:'✍️'},
+  dop:{n:'Dir. Fotografia',i:'🎥'},
+  troupe:{n:'Troupe',i:'🔧'}
+};
+const CORE=['regista','attore','sceneggiatore','dop'];
+const AXES=['Sceneggiatura','Recitazione','Spettacolo visivo'];
+const AXI=['📜','🎭','✨'];
+const GENRES={
+  azione:{name:'Azione',icon:'💥',ideal:[.2,.3,.5],titles:['Mission: Impawssible','Mad Max: Furry Road','John Whisker','Fast & Furrious','Die Hard: Duri a Miagolare']},
+  fantascienza:{name:'Fantascienza',icon:'🚀',ideal:[.3,.15,.55],titles:['Star Paws','Catrix','Blade Purrer','2001: Odissea nella Lettiera','Purrstellar']},
+  horror:{name:'Horror',icon:'👻',ideal:[.3,.4,.3],titles:['Il Silenzio dei Topolini',"L'Esorcicatto",'Paws: Lo Squalo','It: Il Gomitolo Assassino','Shining: Il Puntino Rosso']},
+  commedia:{name:'Commedia',icon:'😹',ideal:[.4,.5,.1],titles:['Mamma, ho perso il topo','Una notte da Leoni (di casa)','Ghost-Mousers','Fantozzi e il Croccantino','Notting Hiss']},
+  romantico:{name:'Romantico',icon:'💘',ideal:[.3,.6,.1],titles:['Titanicat',"Colazione da Fluffany's",'La La Lap','Pretty Kitty Woman','Il Diario di Miao']},
+  dramma:{name:'Dramma',icon:'🎻',ideal:[.5,.4,.1],titles:['Il Gattofather','Forrest Gatto','Le Ali della Lettiera','Nuovo Cinema Gattadiso','La Vita è Miao']},
+  animazione:{name:'Animazione',icon:'🖍️',ideal:[.45,.1,.45],titles:['Il Re Gattone','Toy Mouse','Alla Ricerca di Tonno','Zampotopia','Shrek-a-Miao']},
+  fantasy:{name:'Fantasy',icon:'🧙',ideal:[.35,.2,.45],titles:['Il Signore dei Gomitoli','Harry Pawtter e la Pietra Felina','Il Trono di Graffi',"Narnia: Il Gatto, la Strega e l'Armadio",'La Storia Infinita del Pisolino']}
+};
+const BUDGETS=[
+  {n:'Basso',cost:5000,q:.85,reach:.6,weeks:1,lvl:1,d:'Girato in cantina'},
+  {n:'Medio',cost:20000,q:1,reach:1,weeks:2,lvl:1,d:'Un vero set'},
+  {n:'Alto',cost:60000,q:1.2,reach:1.6,weeks:2,lvl:2,d:'Effetti speciali'},
+  {n:'Blockbuster',cost:150000,q:1.4,reach:2.6,weeks:3,lvl:3,d:'Kolossal felino'}
+];
+const MKT=[
+  {n:'Nessuno',cost:0,m:1,d:'Passaparola'},
+  {n:'Volantini',cost:3000,m:1.2,d:'Sui lampioni'},
+  {n:'Social',cost:10000,m:1.5,d:'Reel su TikCat'},
+  {n:'Mondiale',cost:40000,m:2,d:'Cartelloni ovunque'}
+];
+const LEVELS=[null,
+  {n:'Scatolone di cartone',max:5,rent:500,up:80000},
+  {n:'Teatro di posa',max:9,rent:1500,up:300000},
+  {n:'Major di Miaowood',max:14,rent:4000,up:null}
+];
+const NAMES=['Baffo','Micia','Pallino','Fuffi','Tigre','Ombra','Briciola','Zampa','Pepe','Nuvola','Romeo','Duchessa','Luna','Mimì','Cannella','Biscotto','Pantera','Gino','Ercole','Olivia','Tobia','Neve','Fumo','Lampo','Polpetta','Ginger','Merlino','Cleo','Pixel','Oreo','Margot','Brontolo'];
+const SURN=['Miagolini','Graffiacci','Fusarelli','Codalunga','Pelosetti','Ronfoni','Croccanti','Baffetti','Zampaglione','De Gomitolis','Lettierini','Tonnarelli','Von Pisolino','Acchiappatopi','Morbidoni','Sornioni','Arruffati','Felinucci'];
+const EMO=['🐱','😺','😸','😼','🐈','🐈‍⬛','😻'];
+const OUTLETS=['Miao Times','Gattopardo Weekly','Il Fusa Quotidiano','Rotten Tunas'];
+const QUOTES={
+  hi:['Un capolavoro da fare le fusa.','Ho perso tutte e nove le vite dall\'emozione.','Miagolio d\'oro, senza discussioni.','Lo rivedrei anche invece del pisolino.'],
+  good:['Solido: si gusta come una ciotola di tonno.','Graffia nel modo giusto.','Un bel film, coda alta all\'uscita.','Divertente come una scatola vuota.'],
+  mid:['Né carne né pesce. Soprattutto niente pesce.','Guardabile tra un pisolino e l\'altro.','Qualche buona idea, molta lettiera.','Tiepido come un termosifone a maggio.'],
+  lo:['Una palla di pelo cinematografica.','Ho preferito fissare il muro per tre ore.','Lo seppellirei nella lettiera.','Perfino il cane l\'ha trovato noioso.']
+};
+
+/* ================= UTIL ================= */
+const $=s=>document.querySelector(s);
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const ri=(a,b)=>Math.floor(rnd(a,b+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const fmt=n=>(n<0?'-':'')+'€'+Math.abs(Math.round(n)).toLocaleString('it-IT');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const MONTHS=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const dateStr=w=>`${MONTHS[(w-1)%12]} · Anno ${Math.floor((w-1)/12)+1}`;
+const mesi=n=>n+(n===1?' mese':' mesi');
+function hashHype(t){let h=7;for(const ch of t)h=(h*31+ch.charCodeAt(0))%997;return .85+(h/997)*.4}
+function stars(h){return '⭐'.repeat(clamp(Math.round((h-.8)/.09),1,5))}
+function scoreCls(s){return s>=8?'hi':s>=5?'mid':'lo'}
+
+/* ================= STATO ================= */
+let S=null, speed=1, modalOpen=false, D=null, tab='set', stageKey=null;
+function newState(){
+  return {name:'Miao Studios',money:60000,week:1,fans:0,level:1,cats:[],market:[],films:[],prod:null,
+    target:40,best:0,notes:{},used:{},sequels:{},trend:null,lastGenre:null,id:1,won:false,over:false,log:[],marketWeek:1,earned:0};
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function load(){try{const s=localStorage.getItem(KEY);if(s){S=JSON.parse(s);return true}}catch(e){}return false}
+
+function salary(c){return Math.round((c.skill*c.skill*.15+c.skill*2)/10)*10}
+function hireCost(c){return Math.round(c.skill*c.skill*4/100)*100}
+function payroll(){return S.cats.reduce((a,c)=>a+salary(c),0)+LEVELS[S.level].rent}
+function genCat(role,lvl,lowCap){
+  const r=[[12,42],[28,66],[48,90]][lvl-1];
+  let sk=ri(r[0],lowCap?Math.min(r[1],35):r[1]);
+  if(!lowCap&&Math.random()<.08)sk=Math.min(100,sk+ri(10,20));
+  return {id:S.id++,name:pick(NAMES)+' '+pick(SURN),role,skill:sk,spec:pick(Object.keys(GENRES)),emo:pick(EMO),hue:ri(0,360),films:0};
+}
+function genMarket(first){
+  const roles=[...CORE,'troupe',pick(Object.keys(ROLES)),pick(Object.keys(ROLES))];
+  return roles.map(r=>genCat(r,S.level,first));
+}
+function newTrend(){
+  const k=Object.keys(GENRES).sort(()=>Math.random()-.5);
+  S.trend={hot:k[0],cold:k[1],until:S.week+4};
+  log(`📈 Nuova tendenza: il pubblico impazzisce per ${GENRES[k[0]].icon} ${GENRES[k[0]].name}, mentre ${GENRES[k[1]].icon} ${GENRES[k[1]].name} annoia.`);
+}
+function log(m,toastIt){S.log.unshift({w:S.week,m});S.log=S.log.slice(0,40);if(toastIt)toast(m)}
+function toast(m){const t=document.createElement('div');t.className='toast';t.innerHTML=m;$('#toasts').appendChild(t);setTimeout(()=>t.remove(),4200);while($('#toasts').children.length>3)$('#toasts').firstChild.remove()}
+function missingRoles(){return CORE.filter(r=>!S.cats.some(c=>c.role===r))}
+function catById(id){return S.cats.find(c=>c.id===id)}
+function troupeSum(){return S.cats.filter(c=>c.role==='troupe').reduce((a,c)=>a+c.skill,0)}
+function troupeEff(){return Math.sqrt(troupeSum())*2}
+function axesFor(cast){
+  const g=id=>catById(id)||{skill:10};
+  const reg=g(cast.regista).skill,t=troupeEff();
+  return [g(cast.sceneggiatore).skill+.4*reg+.3*t, g(cast.attore).skill+.4*reg+.3*t, g(cast.dop).skill+.3*reg+t];
+}
+function mixOf(sl){const t=sl[0]+sl[1]+sl[2];return t?sl.map(v=>v/t):[1/3,1/3,1/3]}
+function nextSeq(t){const m=t.match(/ (\d+)$/);return m?t.replace(/ \d+$/,' '+(+m[1]+1)):t+' 2'}
+
+/* ================= TURNI ================= */
+let busy=false;
+function endTurn(){
+  if(!S||S.over||busy||modalOpen)return;
+  busy=true;renderTurnBtn();
+  if(S.prod){for(let i=0;i<7;i++)setTimeout(prodBubble,i*140)}
+  setTimeout(()=>{busy=false;doTurn()},S.prod?1050:200);
+}
+function doTurn(){
+  const rp={month:dateStr(S.week),inc:0,out:0,ev:[]};
+  S.week++;
+  const cost=payroll()*4;S.money-=cost;rp.out=cost;
+  for(const f of S.films){
+    if(f.left>0){const w=Math.round(f.weekly);S.money+=w;f.rev+=w;S.earned+=w;rp.inc+=w;f.weekly*=rnd(.33,.43);f.left--;
+      if(f.left===0){const m=`🎞️ "${esc(f.title)}" esce dalle sale con ${fmt(f.rev)} di incasso.`;log(m);rp.ev.push(m)}}
+  }
+  let rel=false;
+  if(S.prod){
+    const p=S.prod;p.wk++;p.cost+=cost;
+    const ch=Math.max(.08,.45-troupeSum()/300);let nb=0;for(let i=0;i<4;i++)if(Math.random()<ch)nb++;
+    p.bloop+=nb;
+    rp.ev.push(p.wk>=p.weeks?`🎬 Riprese di "${esc(p.title)}" concluse!`:`🎬 "${esc(p.title)}": completato il mese ${p.wk} di ${p.weeks}${nb?` (${nb} ${nb>1?'papere':'papera'})`:''}.`);
+    if(p.wk>=p.weeks)rel=true;
+  }
+  if(S.week>=S.trend.until){newTrend();rp.ev.push(S.log[0].m)}
+  if(S.week-S.marketWeek>=2){S.market=genMarket();S.marketWeek=S.week;log('🐾 Nuovi gatti in cerca di lavoro al Mercato!');rp.ev.push('🐾 Nuovi gatti in cerca di lavoro al Mercato!')}
+  if(Math.random()<.3){const m=randomEvent();if(m)rp.ev.push(m)}
+  S.report=rp;
+  if(rel)release();
+  if(S.money<-30000&&!S.over){gameOver();return}
+  if(!S.won&&S.money>=GOAL){S.won=true;if(modalOpen)S.pendingWin=true;else winModal()}
+  save();render();
+}
+function prodBubble(){
+  const p=S.prod;const m=mixOf(p.sl);
+  let r=Math.random(),i=0;if(r>m[0])i=r>m[0]+m[1]?2:1;
+  const v=Math.max(1,Math.round(p.ax[i]/12*rnd(.6,1.4)));
+  p.pts[i]+=v;
+  bubble(`${AXI[i]} +${v}`);
+  const el=$('#pt'+i);if(el)el.textContent=Math.round(p.pts[i]);
+}
+function bubble(txt,bad){
+  const b=document.createElement('div');b.className='bubble'+(bad?' bad':'');b.textContent=txt;
+  b.style.left=rnd(8,70)+'%';b.style.top=rnd(62,84)+'%';
+  $('#bubbles').appendChild(b);setTimeout(()=>b.remove(),1700);
+}
+function randomEvent(){
+  const c=S.cats.length?pick(S.cats):null;
+  const ev=[
+    ()=>{const x=ri(2,8)*1000;S.money+=x;return `🐟 Un fan ha spedito una cassa di tonno pregiato. La rivendete: +${fmt(x)}`},
+    ()=>c&&(S.money-=1500,`😾 ${esc(c.name)} ha distrutto il divano dell'ufficio. -${fmt(1500)}`),
+    ()=>c&&(S.fans+=ri(200,900),`🌟 Un video di ${esc(c.name)} che fa cadere un bicchiere è virale su TikCat! Nuovi fan.`),
+    ()=>c&&(c.skill=Math.min(100,c.skill+3),`📚 ${esc(c.name)} ha seguito un seminario di miagolio drammatico: +3 abilità.`),
+    ()=>S.prod&&(S.prod.bloop++,`📦 È arrivato uno scatolone sul set: la troupe ci ha passato dentro la giornata. Una papera in più.`),
+    ()=>S.prod&&(S.prod.bloop=Math.max(0,S.prod.bloop-1),`☀️ Un raggio di sole perfetto sul set: tutti ispirati! Una papera in meno.`),
+    ()=>S.prod&&(S.prod.bloop++,`🐭 Un topo è entrato sul set: riprese sospese per inseguimento!`)
+  ];
+  const r=pick(ev)();if(r)log(r);return r;
+}
+
+/* ================= AZIONI ================= */
+function setSpeed(){}
+function hire(id){
+  const c=S.market.find(x=>x.id===id);if(!c)return;
+  if(S.cats.length>=LEVELS[S.level].max){toast('🏢 Lo studio è pieno! Migliora la sede nella scheda Studio.');return}
+  const cost=hireCost(c);if(S.money<cost){toast('💸 Non hai abbastanza soldi per questo ingaggio.');return}
+  S.money-=cost;S.market=S.market.filter(x=>x.id!==id);S.cats.push(c);buzz(25);
+  log(`✅ ${esc(c.name)} si unisce allo studio come ${ROLES[c.role].n}!`);render();
+}
+function fire(id){
+  const c=catById(id);if(!c)return;
+  if(S.prod&&Object.values(S.prod.cast).includes(id)){toast(`🎬 ${esc(c.name)} è sul set: non puoi licenziarlo durante le riprese!`);return}
+  const sev=salary(c)*4;S.money-=sev;S.cats=S.cats.filter(x=>x.id!==id);
+  log(`👋 ${esc(c.name)} lascia lo studio (liquidazione ${fmt(sev)}).`);render();
+}
+function refreshMarket(){
+  if(S.money<1000){toast('💸 Servono €1.000 per un nuovo casting.');return}
+  S.money-=1000;S.market=genMarket();S.marketWeek=S.week;log('📣 Hai indetto un nuovo casting!');render();
+}
+function upgrade(){
+  const L=LEVELS[S.level];if(!L.up)return;
+  if(S.money<L.up){toast('💸 Non hai abbastanza soldi per trasferirti.');return}
+  S.money-=L.up;S.level++;
+  log(`🏢 Trasloco completato! Ora siete un ${LEVELS[S.level].n}. Nuovi budget e gatti più talentuosi disponibili.`,true);
+  S.market=genMarket();S.marketWeek=S.week;render();
+}
+function setTab(t){const ch=t!==tab;tab=t;renderSide();if(ch)window.scrollTo(0,0)}
+function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+
+/* ================= WIZARD NUOVO FILM ================= */
+function newFilm(){
+  const miss=missingRoles();
+  if(miss.length){toast('Ti manca: '+miss.map(r=>ROLES[r].n).join(', ')+'. Assoldali dal Mercato!');setTab('mercato');return}
+  D={step:1,genre:null,title:null,titles:[],cast:{},budget:1,mkt:0,sl:[5,5,5]};
+  CORE.forEach(r=>{D.cast[r]=S.cats.filter(c=>c.role===r).sort((a,b)=>b.skill-a.skill)[0].id});
+  wiz();
+}
+function availTitles(gk){
+  const out=[];
+  GENRES[gk].titles.forEach(t=>{if(!S.used[t])out.push({t,hype:hashHype(t),seq:false})});
+  (S.sequels[gk]||[]).forEach(s=>{if(!S.used[s.t])out.push({t:s.t,hype:s.hype,seq:true})});
+  return out;
+}
+function trendTag(gk){return S.trend.hot===gk?'<span class="tag hot">🔥 Di moda</span>':S.trend.cold===gk?'<span class="tag cold">❄️ In calo</span>':''}
+function pickGenre(k){D.genre=k;D.title=null;D.titles=availTitles(k);wiz()}
+function pickTitle(i){D.title=D.titles[i];wiz()}
+function wiz(){
+  const st=['1 · Il film','2 · Il cast','3 · Produzione'];
+  let h=`<h2>🎬 Nuova produzione</h2><div class="steps">${st.map((s,i)=>`<span class="${D.step===i+1?'on':''}">${s}</span>`).join('')}</div>`;
+  if(D.step===1){
+    h+=`<div class="muted" style="margin-bottom:8px">Scegli il genere</div><div class="ggrid">`+
+      Object.entries(GENRES).map(([k,g])=>`<button class="gbtn ${D.genre===k?'on':''}" onclick="pickGenre('${k}')"><span class="e">${g.icon}</span>${g.name}<br>${trendTag(k)}</button>`).join('')+`</div>`;
+    if(D.genre){
+      h+=`<div class="muted" style="margin-bottom:8px">Scegli il titolo (⭐ = potenziale di richiamo)</div><div class="tlist">`;
+      h+=D.titles.length?D.titles.map((t,i)=>`<button class="${D.title&&D.title.t===t.t?'on':''}" onclick="pickTitle(${i})"><span>${t.seq?'🔁 ':''}${esc(t.t)}</span><span>${stars(t.hype)}</span></button>`).join(''):'<div class="muted">Hai già prodotto tutti i titoli di questo genere. Fai un successo per sbloccare i sequel!</div>';
+      h+=`</div>`;
+      if(S.lastGenre===D.genre)h+=`<div class="note">⚠️ Il tuo ultimo film era dello stesso genere: il pubblico potrebbe essere un po' stanco.</div>`;
+    }
+    h+=`<div class="foot"><button class="btn" onclick="closeModal()">Annulla</button><button class="btn gold" ${D.title?'':'disabled'} onclick="D.step=2;wiz()">Avanti →</button></div>`;
+  }else if(D.step===2){
+    const g=GENRES[D.genre];
+    h+=`<div class="note">${g.icon} <b>${esc(D.title.t)}</b> · i gatti specializzati in ${g.name} (⭐) danno un bonus.</div>`;
+    CORE.forEach(r=>{
+      const opts=S.cats.filter(c=>c.role===r).sort((a,b)=>b.skill-a.skill)
+        .map(c=>`<option value="${c.id}" ${D.cast[r]===c.id?'selected':''}>${esc(c.name)} · ${Math.round(c.skill)}${c.spec===D.genre?' ⭐':''}</option>`).join('');
+      h+=`<div class="row"><label>${ROLES[r].i} ${ROLES[r].n}</label><select onchange="D.cast['${r}']=+this.value;wiz()">${opts}</select></div>`;
+    });
+    const tr=S.cats.filter(c=>c.role==='troupe');
+    h+=`<div class="row"><label>🔧 Troupe</label><span class="muted">${tr.length?tr.map(c=>esc(c.name.split(' ')[0])+(c.spec===D.genre?' ⭐':'')).join(', ')+' (tutta la troupe lavora sul set)':'Nessuno: più papere sul set e meno spettacolo visivo'}</span></div>`;
+    const ax=axesFor(D.cast);
+    h+=`<div class="muted">Potenziale del cast</div><div class="prev">${AXES.map((a,i)=>`<span>${AXI[i]} ${a}</span><div class="bar"><i style="width:${clamp(ax[i]/1.6,2,100)}%"></i></div><b>${Math.round(ax[i])}</b>`).join('')}</div>`;
+    h+=`<div class="foot"><button class="btn" onclick="D.step=1;wiz()">← Indietro</button><button class="btn gold" onclick="D.step=3;wiz()">Avanti →</button></div>`;
+  }else{
+    const g=GENRES[D.genre],B=BUDGETS[D.budget],M=MKT[D.mkt],n=S.notes[D.genre];
+    h+=`<div class="muted" style="margin-bottom:6px">Budget di produzione</div><div class="opts">`+
+      BUDGETS.map((b,i)=>`<button class="opt ${D.budget===i?'on':''}" ${S.level<b.lvl?'disabled':''} onclick="D.budget=${i};wiz()"><b>${b.n}</b>${fmt(b.cost)}<br><small>${S.level<b.lvl?'🔒 Sede liv. '+b.lvl:b.d+' · '+mesi(b.weeks)}</small></button>`).join('')+`</div>`;
+    h+=`<div class="muted" style="margin-bottom:6px">Marketing</div><div class="opts">`+
+      MKT.map((m,i)=>`<button class="opt ${D.mkt===i?'on':''}" onclick="D.mkt=${i};wiz()"><b>${m.n}</b>${fmt(m.cost)}<br><small>${m.d}</small></button>`).join('')+`</div>`;
+    h+=`<div class="muted" style="margin-bottom:6px">Dove concentrare il lavoro della troupe?</div>`;
+    const mx=mixOf(D.sl);
+    h+=AXES.map((a,i)=>`<div class="slider"><span>${AXI[i]} ${a}</span><input type="range" min="0" max="10" value="${D.sl[i]}" oninput="setSl(${i},this.value)"><b id="slp${i}">${Math.round(mx[i]*100)}%</b></div>`).join('');
+    h+=`<div class="note">📓 <b>Taccuino ${g.name}:</b> ${n?`${esc(n.hint)}${n.mix?`<br>Miglior mix trovato finora: 📜 ${n.mix[0]}% · 🎭 ${n.mix[1]}% · ✨ ${n.mix[2]}% (sintonia ${n.bestFit}%)`:''}`:'nessun dato. Sperimenta: dopo l\'uscita i critici ti diranno cosa hanno apprezzato.'}</div>`;
+    const up=B.cost+M.cost,pr=payroll()*4*B.weeks;
+    h+=`<div class="sum"><span>Costo immediato (budget + marketing)</span><b>${fmt(up)}</b><span>Stipendi e affitto per ${mesi(B.weeks)}</span><b>~${fmt(pr)}</b><span>Cassa attuale</span><b class="${S.money-up<0?'neg':''}">${fmt(S.money)}</b></div>`;
+    h+=`<div class="foot"><button class="btn" onclick="D.step=2;wiz()">← Indietro</button><button class="btn gold" ${S.money<up?'disabled':''} onclick="startProd()">🎬 Ciak, si gira!</button></div>`;
+    if(S.money<up)h+=`<div class="warn">Non hai abbastanza soldi per questo budget.</div>`;
+  }
+  showModal(h);
+}
+function setSl(i,v){D.sl[i]=+v;const m=mixOf(D.sl);m.forEach((x,j)=>{$('#slp'+j).textContent=Math.round(x*100)+'%'})}
+function startProd(){
+  const B=BUDGETS[D.budget],M=MKT[D.mkt],up=B.cost+M.cost;
+  if(S.money<up)return;
+  S.money-=up;S.used[D.title.t]=true;
+  S.prod={title:D.title.t,hype:D.title.hype,genre:D.genre,cast:{...D.cast},budget:D.budget,mkt:D.mkt,sl:[...D.sl],
+    weeks:B.weeks,wk:0,bloop:0,cost:up,pts:[0,0,0],ax:axesFor(D.cast)};
+  tab='set';closeModal();window.scrollTo(0,0);
+  log(`🎬 Iniziano le riprese di "${esc(D.title.t)}"!`,true);render();
+}
+
+/* ================= USCITA ================= */
+function release(){
+  const p=S.prod;S.prod=null;stageKey=null;
+  const g=GENRES[p.genre],B=BUDGETS[p.budget],M=MKT[p.mkt];
+  const ax=axesFor(p.cast),mix=mixOf(p.sl);
+  const weighted=ax[0]*mix[0]+ax[1]*mix[1]+ax[2]*mix[2];
+  const diffs=mix.map((m,i)=>m-g.ideal[i]);
+  const fit=1-diffs.reduce((a,d)=>a+Math.abs(d),0)/2;
+  const castCats=[...CORE.map(r=>catById(p.cast[r])).filter(Boolean),...S.cats.filter(c=>c.role==='troupe')];
+  const specN=castCats.filter(c=>c.spec===p.genre).length;
+  const spec=1+Math.min(.3,.05*specN);
+  const q=weighted*(.4+.8*fit)*B.q*spec*Math.max(.6,1-.015*p.bloop)*rnd(.95,1.05);
+  const score=Math.round(clamp(q/S.target*7+rnd(-.6,.6),1,10)*10)/10;
+  const record=S.films.length>0&&q>S.best;
+  S.best=Math.max(S.best,q);S.target=Math.max(S.target+.8,S.best*.85);
+  const trendM=S.trend.hot===p.genre?1.5:S.trend.cold===p.genre?.7:1;
+  const rep=S.lastGenre===p.genre?.85:1;S.lastGenre=p.genre;
+  const fanF=1+Math.sqrt(S.fans)/60;
+  const opening=score*score*trendM*p.hype*fanF*B.reach*M.m*300*rep*rnd(.9,1.1);
+  const dFans=score>=5?Math.round(score*score*B.reach*M.m*15):-Math.round((5-score)*120*B.reach);
+  S.fans=Math.max(0,S.fans+dFans);
+  castCats.forEach(c=>{c.skill=Math.min(100,c.skill+rnd(1.5,4)*(score>=7?1.3:1));c.films++});
+  // taccuino
+  const n=S.notes[p.genre]||(S.notes[p.genre]={hint:'',mix:null,bestFit:0,count:0,best:0});
+  n.count++;n.best=Math.max(n.best,score);
+  let mi=0;diffs.forEach((d,i)=>{if(Math.abs(d)>Math.abs(diffs[mi]))mi=i});
+  n.hint=Math.abs(diffs[mi])<.07?'🎯 I critici lodano l\'equilibrio perfetto per questo genere!':diffs[mi]<0?`Serviva più attenzione a: ${AXI[mi]} ${AXES[mi]}.`:`Troppa enfasi su: ${AXI[mi]} ${AXES[mi]}.`;
+  const fitP=Math.round(fit*100);
+  if(fitP>n.bestFit){n.bestFit=fitP;n.mix=mix.map(m=>Math.round(m*100))}
+  // sequel
+  let seq=null;
+  if(score>=8){
+    const nt=nextSeq(p.title),num=(nt.match(/ (\d+)$/)||[0,2])[1];
+    seq={t:nt,hype:p.hype*(num<=2?1.15:.92)};
+    (S.sequels[p.genre]=S.sequels[p.genre]||[]).push(seq);
+  }
+  const f={title:p.title,genre:p.genre,score,opening,weekly:opening*2.86,left:3,rev:0,cost:p.cost,week:S.week};
+  S.films.push(f);
+  log(`🍿 "${esc(p.title)}" arriva nelle sale con un voto di ${score}!`);
+  // modale
+  const reviews=OUTLETS.map(o=>{const v=clamp(Math.round(score+rnd(-1,1)),1,10);return{o,v,q:pick(QUOTES[v>=9?'hi':v>=7?'good':v>=5?'mid':'lo'])}});
+  let h=`<h2>🎞️ La prima di "${esc(p.title)}"</h2><div class="muted">${g.icon} ${g.name} · ${BUDGETS[p.budget].n} · ${mesi(p.weeks)} di riprese · ${p.bloop} papere</div><div style="margin-top:12px">`;
+  h+=reviews.map((r,i)=>`<div class="review" style="animation-delay:${i*.25}s"><div class="score ${scoreCls(r.v)}">${r.v}</div><div><b>${r.o}</b><br><i>«${r.q}»</i></div></div>`).join('');
+  h+=`</div><div class="avg">${score.toFixed(1)}</div>`;
+  if(record)h+=`<div class="note">🏆 <b>Nuovo record dello studio!</b> Il film migliore che abbiate mai fatto.</div>`;
+  h+=`<div class="sum"><span>Incasso previsto nel primo mese</span><b>${fmt(opening*2.86)}</b><span>Fan</span><b class="${dFans>=0?'pos':'neg'}">${dFans>=0?'+':''}${dFans.toLocaleString('it-IT')}</b><span>Sintonia col genere</span><b>${fitP}%</b></div>`;
+  h+=`<div class="note">📓 ${esc(n.hint)}</div>`;
+  const notes=[];
+  if(trendM>1)notes.push('🔥 Il genere è di moda: pubblico in fila!');
+  if(trendM<1)notes.push('❄️ Il genere è in calo: sale semivuote.');
+  if(rep<1)notes.push('🥱 Lo stesso genere del film precedente ha stancato un po\' il pubblico.');
+  if(specN)notes.push(`⭐ ${specN} gatti specializzati hanno dato un bonus.`);
+  if(seq)notes.push(`🔁 Successo! Sbloccato il sequel <b>"${esc(seq.t)}"</b>.`);
+  if(notes.length)h+=`<div class="muted" style="line-height:1.6">${notes.join('<br>')}</div>`;
+  h+=`<div class="foot"><span></span><button class="btn gold" onclick="closeModal()">Continua</button></div>`;
+  showModal(h);save();buzz([40,40,90]);
+}
+
+/* ================= MODALI ================= */
+function showModal(h){$('#modal').innerHTML=h;$('#modalbg').classList.remove('hidden');modalOpen=true}
+function closeModal(){$('#modalbg').classList.add('hidden');modalOpen=false;if(S&&S.pendingWin){S.pendingWin=false;winModal();return}if(S)render()}
+function help(){
+  showModal(`<h2>❓ Come si gioca</h2><ul class="help">
+  <li><b>Obiettivo:</b> rendere la tua casa di produzione profittevole e arrivare a <b>${fmt(GOAL)}</b> in cassa. Se scendi sotto <b>${fmt(-30000)}</b> fallisci.</li>
+  <li><b>Niente fretta:</b> il gioco è a turni. Il tempo avanza di un mese solo quando premi <b>⏭</b> in basso, quindi puoi pensare con calma a ogni scelta.</li>
+  <li><b>Assolda i gatti</b> dal Mercato: servono almeno un 🎬 Regista, un 🎭 Attore, uno ✍️ Sceneggiatore e un 🎥 Dir. Fotografia. La 🔧 Troupe è facoltativa ma riduce le papere e migliora lo spettacolo visivo.</li>
+  <li>Ogni mese paghi gli <b>stipendi</b> dei gatti e l'affitto, e incassi dai film in sala. Un film resta in sala 3 mesi.</li>
+  <li><b>Nuovo film:</b> scegli genere e titolo, il cast, il budget, il marketing e come distribuire il lavoro tra 📜 Sceneggiatura, 🎭 Recitazione e ✨ Spettacolo visivo. Ogni genere ha un mix ideale segreto: i critici ti daranno indizi, annotati nel <b>Taccuino</b>.</li>
+  <li>Segui le <b>tendenze</b> 🔥 del pubblico, evita di ripetere lo stesso genere di fila e sfrutta i gatti specializzati ⭐.</li>
+  <li>Il pubblico si aspetta sempre di più: per prendere voti alti devi superare i tuoi film precedenti. I gatti migliorano con l'esperienza.</li>
+  <li>Un film con voto 8+ sblocca un <b>sequel</b>. Migliora la sede nella scheda Studio per budget più grandi e talenti migliori.</li>
+  </ul><div class="foot"><span></span><button class="btn gold" onclick="closeModal()">Ho capito, si gira!</button></div>`);
+}
+function titleScreen(){
+  let has=false;try{has=!!localStorage.getItem(KEY)}catch(e){}
+  showModal(`<div class="title-s"><div class="big-emo">🎬🐱🍿</div><h1>Miao Studios</h1><p class="muted">Il tycoon del cinema... felino</p>
+  ${has?`<button class="btn gold wide" onclick="continueGame()">▶ Continua la partita</button>`:''}
+  <label>Nome della tua casa di produzione</label><input id="sname" type="text" value="Miao Studios" maxlength="28">
+  <button class="btn wide ${has?'':'gold'}" onclick="startNew()">✨ Nuova partita</button></div>`);
+}
+function startNew(){
+  const nm=($('#sname').value||'').trim()||'Miao Studios';
+  S=newState();S.name=nm;newTrend();S.market=genMarket(true);S.log=[];
+  log(`🎉 Benvenuto a ${esc(nm)}! Assolda i tuoi primi gatti dal Mercato.`);
+  tab='mercato';stageKey=null;$('#toasts').innerHTML='';save();render();help();
+}
+function continueGame(){if(load()){stageKey=null;closeModal();render()}else startNew()}
+function gameOver(){
+  S.over=true;save();render();
+  showModal(`<h2>💀 Bancarotta!</h2><p>${esc(S.name)} ha chiuso i battenti dopo ${S.films.length} film. I gatti sono tornati a dormire sul divano.</p>
+  <div class="sum"><span>Mesi di attività</span><b>${S.week}</b><span>Incassi totali</span><b>${fmt(S.earned)}</b><span>Fan conquistati</span><b>${S.fans.toLocaleString('it-IT')}</b></div>
+  <div class="foot"><span></span><button class="btn gold" onclick="try{localStorage.removeItem(KEY)}catch(e){};titleScreen()">Ricomincia</button></div>`);
+}
+function winModal(){
+  showModal(`<div class="title-s"><div class="big-emo">🏆🐱🏆</div><h2>${esc(S.name)} è una Major!</h2>
+  <p>Hai raggiunto ${fmt(GOAL)} in cassa. Il tuo nome brilla sulla Walk of Paws di Miaowood!</p>
+  <div class="sum"><span>Film prodotti</span><b>${S.films.length}</b><span>Mesi</span><b>${S.week}</b><span>Fan</span><b>${S.fans.toLocaleString('it-IT')}</b></div>
+  <button class="btn gold wide" onclick="closeModal()">Continua a produrre</button></div>`);
+}
+
+/* ================= RENDER ================= */
+function render(){
+  if(!S)return;
+  $('#studioName').textContent=S.name;
+  const pr=payroll();
+  $('#stats').innerHTML=`<div class="stat ${S.money<0?'neg':''}">💰 <b>${fmt(S.money)}</b> <small class="muted">-${fmt(pr*4)}/mese</small></div>
+  <div class="stat">📅 <b>${dateStr(S.week)}</b></div>
+  <div class="stat">❤️ Fan <b>${S.fans.toLocaleString('it-IT')}</b></div>
+  <div class="stat">🎯 ${Math.max(0,Math.floor(S.money/GOAL*100))}%<span class="goalbar"><i style="width:${clamp(S.money/GOAL*100,0,100)}%"></i></span></div>`;
+  const tw=S.trend.until-S.week;
+  $('#ticker').innerHTML=`<span>🔥 Di moda: <b>${GENRES[S.trend.hot].icon} ${GENRES[S.trend.hot].name}</b></span><span>❄️ In calo: <b>${GENRES[S.trend.cold].icon} ${GENRES[S.trend.cold].name}</b></span><span>Prossima tendenza tra ${mesi(tw)}</span>${S.money<0?'<span style="color:var(--bad)">⚠️ Sei in rosso! Sotto -€30.000 fallisci.</span>':''}`;
+  renderStage();renderReport();renderTheaters();renderNews();renderSide();renderTurnBtn();
+}
+function renderStage(){
+  const miss=missingRoles();
+  const key=S.prod?'p'+S.prod.title:'i'+miss.join()+S.over;
+  if(key!==stageKey){
+    stageKey=key;
+    if(S.prod){
+      const p=S.prod,g=GENRES[p.genre];
+      $('#stage').innerHTML=`<div class="prodhead"><span class="tag">${g.icon} ${g.name}</span> <span class="tag">${BUDGETS[p.budget].n}</span><h2>"${esc(p.title)}"</h2><div class="phase" id="phase"></div></div>
+      <div class="pbar"><i id="pbar" style="width:0"></i></div>
+      <div class="setcats">${CORE.map((r,i)=>{const c=catById(p.cast[r])||{emo:'🐱',hue:0,name:'?'};return `<div class="sc"><div class="av big bob" style="background:hsl(${c.hue} 45% 32%);animation-delay:${i*.25}s">${c.emo}</div><small>${ROLES[r].i} ${esc(c.name.split(' ')[0])}</small></div>`}).join('')}</div>
+      <div class="pts">${AXI.map((a,i)=>`<span>${a} <b id="pt${i}">${Math.round(p.pts[i])}</b></span>`).join('')}<span>🐾 Papere <b id="bloop">${p.bloop}</b></span></div>`;
+    }else{
+      $('#stage').innerHTML=`<div class="marquee"><div class="bulbs"></div><h2>${esc(S.name.toUpperCase())}</h2><small>Il set è vuoto... i gatti dormono.</small></div><br>
+      <button class="btn gold big" onclick="newFilm()" ${S.over?'disabled':''}>🎬 Nuovo film</button>
+      <div class="muted" style="margin-top:10px">Il tempo passa solo quando premi ⏭ in basso.</div>
+      ${miss.length?`<div class="warn">Per girare ti serve ancora: ${miss.map(r=>ROLES[r].i+' '+ROLES[r].n).join(', ')}</div>`:''}`;
+    }
+  }
+  if(S.prod){
+    const p=S.prod,prog=(p.wk+.5)/p.weeks;
+    const ph=prog<.25?'📝 Pre-produzione':prog<.8?'🎥 Riprese':'✂️ Post-produzione';
+    const e=$('#phase');if(e)e.textContent=`${ph} · mese ${p.wk+1} di ${p.weeks}`;
+    const pb=$('#pbar');if(pb)pb.style.width=(p.wk/p.weeks*100)+'%';
+    const b=$('#bloop');if(b)b.textContent=p.bloop;
+  }
+}
+function renderTheaters(){
+  const on=S.films.filter(f=>f.left>0).reverse();
+  $('#theaters').innerHTML=on.length?on.map(f=>`<div class="film"><div class="score ${scoreCls(f.score)}">${f.score.toFixed(1)}</div>
+  <div class="ci"><b>${GENRES[f.genre].icon} ${esc(f.title)}</b><small>Ancora ${mesi(f.left)} in sala · finora ${fmt(f.rev)}</small></div>
+  <div class="cr"><b class="pos">+${fmt(f.weekly)}</b><small>prossimo mese</small></div></div>`).join(''):'<div class="muted">Nessun film in sala. Il pubblico aspetta!</div>';
+}
+function renderNews(){$('#news').innerHTML=S.log.slice(0,25).map(l=>`<div><small>${dateStr(l.w)}</small>${l.m}</div>`).join('')}
+function catRow(c,right){
+  const R=ROLES[c.role],g=GENRES[c.spec];
+  return `<div class="cat"><div class="av" style="background:hsl(${c.hue} 45% 32%)">${c.emo}</div>
+  <div class="ci"><b>${esc(c.name)}</b><small>${R.i} ${R.n} · ⭐ ${g.icon} ${g.name}${c.films?` · ${c.films} film`:''}</small><div class="bar"><i style="width:${c.skill}%"></i></div></div>
+  <div class="cr"><div class="sk">${Math.round(c.skill)}</div>${right}</div></div>`;
+}
+function renderSide(){
+  const T={staff:'🐱 Staff',mercato:'🛒 Mercato',film:'🎞️ Film',taccuino:'📓 Taccuino',studio:'🏢 Studio'};
+  const NV={set:['🎬','Set'],staff:['🐱','Staff'],mercato:['🛒','Mercato'],film:['🎞️','Film'],taccuino:['📓','Taccuino'],studio:['🏢','Studio']};
+  const miss=missingRoles().length;
+  $('#nav').innerHTML=Object.entries(NV).map(([k,v])=>`<button class="${tab===k?'on':''}" onclick="setTab('${k}')"><span class="i">${v[0]}</span>${v[1]}${k==='mercato'&&miss?'<span class="dot"></span>':''}${k==='set'&&S.prod?`<span class="navprog"><i style="width:${S.prod.wk/S.prod.weeks*100}%"></i></span>`:''}</button>`).join('');
+  $('#v-set').classList.toggle('on',tab==='set');$('#v-side').classList.toggle('on',tab!=='set');
+  if(tab==='set')return;
+  $('#sideTitle').textContent=T[tab];
+  const L=LEVELS[S.level];let h='';
+  if(tab==='staff'){
+    h=`<div class="muted" style="margin-bottom:8px">${S.cats.length}/${L.max} gatti · stipendi ${fmt((payroll()-L.rent)*4)}/mese</div>`;
+    const order=[...CORE,'troupe'];
+    const cs=[...S.cats].sort((a,b)=>order.indexOf(a.role)-order.indexOf(b.role)||b.skill-a.skill);
+    h+=cs.length?cs.map(c=>catRow(c,`<small>${fmt(salary(c)*4)}/mese</small><button class="btn sm red" onclick="fire(${c.id})">Licenzia</button>`)).join(''):'<div class="muted">Nessun gatto nello studio. Vai al Mercato!</div>';
+  }else if(tab==='mercato'){
+    const full=S.cats.length>=L.max;
+    h=`<div class="row" style="justify-content:space-between"><span class="muted">Nuovi arrivi tra ${mesi(Math.max(1,2-(S.week-S.marketWeek)))}</span><button class="btn sm" onclick="refreshMarket()">📣 Nuovo casting (€1.000)</button></div>`;
+    if(full)h+=`<div class="note">🏢 Lo studio è pieno (${L.max} gatti). Licenzia qualcuno o migliora la sede.</div>`;
+    h+=S.market.length?S.market.map(c=>catRow(c,`<small>Ingaggio ${fmt(hireCost(c))}<br>${fmt(salary(c)*4)}/mese</small><button class="btn sm gold" ${full||S.money<hireCost(c)?'disabled':''} onclick="hire(${c.id})">Assolda</button>`)).join(''):'<div class="muted">Nessun gatto disponibile. Indici un casting!</div>';
+  }else if(tab==='film'){
+    const fs=[...S.films].reverse();
+    h=fs.length?fs.map(f=>{const prof=f.rev-f.cost;return `<div class="film"><div class="score ${scoreCls(f.score)}">${f.score.toFixed(1)}</div>
+    <div class="ci"><b>${GENRES[f.genre].icon} ${esc(f.title)}</b><small>${dateStr(f.week)} · incasso ${fmt(f.rev)}${f.left>0?' (in sala)':''}</small></div>
+    <div class="cr"><b class="${prof>=0?'pos':'neg'}">${prof>=0?'+':''}${fmt(prof)}</b><small>profitto</small></div></div>`}).join(''):'<div class="muted">Non hai ancora prodotto nessun film.</div>';
+  }else if(tab==='taccuino'){
+    h=`<div class="muted" style="margin-bottom:8px">Ogni genere ha un mix ideale di 📜 Sceneggiatura, 🎭 Recitazione e ✨ Spettacolo visivo. Qui annoti cosa dicono i critici.</div>`;
+    h+=Object.entries(GENRES).map(([k,g])=>{const n=S.notes[k];return `<div class="cat" style="display:block"><b>${g.icon} ${g.name}</b> ${trendTag(k)}<br>
+    <small class="muted">${n?`${n.count} film · miglior voto ${n.best.toFixed(1)}<br>${esc(n.hint)}${n.mix?`<br>Miglior mix: 📜 ${n.mix[0]}% · 🎭 ${n.mix[1]}% · ✨ ${n.mix[2]}% (sintonia ${n.bestFit}%)`:''}`:'Ancora nessun dato.'}</small></div>`}).join('');
+  }else{
+    h=`<div class="cat" style="display:block"><b>🏢 ${L.n}</b> (livello ${S.level})<br><small class="muted">Fino a ${L.max} gatti · affitto ${fmt(L.rent*4)}/mese · budget fino a ${BUDGETS.filter(b=>b.lvl<=S.level).pop().n}</small></div>`;
+    if(L.up){const N=LEVELS[S.level+1];h+=`<div class="note">Prossima sede: <b>${N.n}</b><br>Fino a ${N.max} gatti, affitto ${fmt(N.rent*4)}/mese, sblocca il budget ${BUDGETS.find(b=>b.lvl===S.level+1).n} e gatti più talentuosi.</div><button class="btn gold wide" ${S.money<L.up?'disabled':''} onclick="upgrade()">Trasferisciti per ${fmt(L.up)}</button>`}
+    else h+=`<div class="note">🌟 Hai la sede più prestigiosa di Miaowood!</div>`;
+    const avg=S.films.length?(S.films.reduce((a,f)=>a+f.score,0)/S.films.length).toFixed(1):'–';
+    h+=`<div class="sum" style="margin-top:14px"><span>Film prodotti</span><b>${S.films.length}</b><span>Voto medio</span><b>${avg}</b><span>Incassi totali</span><b>${fmt(S.earned)}</b><span>Fan</span><b>${S.fans.toLocaleString('it-IT')}</b><span>Obiettivo</span><b>${fmt(GOAL)}</b></div>
+    <button class="btn wide" onclick="save();toast('💾 Partita salvata!')">💾 Salva partita</button>
+    <button class="btn wide red" onclick="titleScreen()">🏠 Menu principale</button>`;
+  }
+  $('#tabc').innerHTML=h;
+}
+
+function renderReport(){
+  const r=S.report,el=$('#report');
+  if(!r){el.style.display='none';return}
+  const d=r.inc-r.out;el.style.display='';
+  el.innerHTML=`<h3>📋 Resoconto di ${r.month}</h3><div class="sum"><span>🍿 Incassi dalle sale</span><b class="pos">+${fmt(r.inc)}</b><span>💸 Stipendi e affitto</span><b class="neg">-${fmt(r.out)}</b><span><b>Saldo del mese</b></span><b class="${d>=0?'pos':'neg'}">${d>=0?'+':''}${fmt(d)}</b></div>${r.ev.length?`<div class="news">${r.ev.map(e=>`<div>${e}</div>`).join('')}</div>`:''}`;
+}
+function renderTurnBtn(){
+  const b=$('#endTurn');if(!b||!S)return;
+  $('#turnbar').style.display='';b.disabled=busy||S.over;
+  const next=MONTHS[S.week%12];let sub;
+  if(busy){b.innerHTML=S.prod?'🎬 Si gira...':'⏳ Passa il mese...';return}
+  if(S.prod)sub=S.prod.wk+1>=S.prod.weeks?`🎞️ A fine mese esce "${esc(S.prod.title)}"!`:`🎬 Riprese: mese ${S.prod.wk+1} di ${S.prod.weeks}`;
+  else sub=S.films.some(f=>f.left>0)?'🍿 Incassi in arrivo dai film in sala':'Nessun film in lavorazione';
+  b.innerHTML=`<span>⏭ Passa a ${next}</span><small>${sub} · spese ${fmt(payroll()*4)}</small>`;
+}
+/* ================= AVVIO ================= */
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&S)save()});
+setSpeed(1);
+titleScreen();
+</script>
+</body>
+</html>
